@@ -1,0 +1,44 @@
+{
+  "columns": [
+    {
+      "colName": "AREA",
+      "type": "character",
+      "filterable": 1
+    },
+    {
+      "colName": "DATA",
+      "type": "date",
+      "filterable": 1
+    },
+    {
+      "colName": "FASE",
+      "type": "character",
+      "filterable": 1
+    },
+    {
+      "colName": "UNIDADE_MEDIDA",
+      "type": "character",
+      "filterable": 1
+    },
+    {
+      "colName": "IMPACTO",
+      "type": "character",
+      "filterable": 1
+    },
+    {
+      "colName": "COLUNA",
+      "type": "integer",
+      "filterable": 1
+    },
+    {
+      "colName": "PRODUCAO",
+      "type": "float",
+      "filterable": 0
+    },
+    {
+      "colName": "CONTAMINACAO",
+      "type": "float",
+      "filterable": 0
+    }
+  ]
+}
