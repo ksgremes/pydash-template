@@ -19,7 +19,7 @@ def render_sidebar():
     return([
         dbc.NavLink("Home", href="/", active="exact"),
         dbc.NavLink("Page 1", href="/main_page", active="exact"),
-        dbc.NavLink("Page 2", href="/page-2", active="exact"),
+        dbc.NavLink("Page 2", href="/page-2", active="exact")
     ])
 
 

@@ -11,13 +11,59 @@ import json
 
 def render_top(columns):
     num_cols = sum([col["filterable"] for col in columns])
-    return([
-        dbc.Nav(
-            [create_filter(col, num_cols)
-                for col in columns if col["filterable"] != 0],
-            vertical=False
-        )
-    ])
+    separador = html.Div(
+        [
+            dbc.Row(
+                [
+                    dbc.Col([html.H3("Cores nos gráficos:")],
+                            style={
+                                "textAlign": "right",
+                                "padding": "5px"
+                            },
+                            width=5),
+                    dbc.Col(
+                        [dcc.Dropdown(
+                            id="separador",
+                            options=[{"label": col["colName"],
+                                      "value": col["colName"]}
+                                        for col in columns],
+                                      placeholder="Selecione uma coluna",
+                                      clearable=True
+                        )],
+                        style={
+                            "textAlign": "left",
+                            "color": "#000000",
+                            "padding": "5px"
+                        },
+                        width=6
+                    )
+
+                ]
+            ),
+            html.Hr(style={"borderTop": "2px solid #2196F3"})
+        ]
+    )
+    box = html.Div(
+        [
+            html.H3("Seleção de dados:"),
+            dbc.Nav(
+                [create_filter(col, num_cols)
+                    for col in columns if col["filterable"] != 0],
+                vertical=False
+                )
+        ],
+
+    )
+    return(html.Div(
+        [separador, box],
+        style={
+            "backgroundColor": "#202020",
+            "color": "#2196F3",
+            "borderRadius": "5px",
+            "textAlign": "left",
+            "padding": "5px "
+        }
+    ))
 
 
 def create_filter(column, num_cols):
@@ -33,7 +79,8 @@ def create_filter(column, num_cols):
             options=[{"label": val, "value": val} for val in values],
             value=values,
             multi=True,
-            clearable=True
+            clearable=True,
+            style={"height": "100px", "color": "#000000"}
         )
     elif column["type"] == "date":
         datas = [dta.datetime.strptime(mes, "%Y-%m-%dT%H:%M:%SZ")
@@ -41,16 +88,13 @@ def create_filter(column, num_cols):
         filt = dcc.DatePickerRange(
             start_date=min(datas),
             end_date=max(datas),
-            display_format="Y-M-D"
+            display_format="Y-M-D",
+            style={"height": "100px"}
         )
+    # return(html.Div(filt, style={"width": f"{95/num_cols:.2f}%", "padding": "5px"}))
     return(html.Div(
-        [
-            dbc.DropdownMenu(
-                label=column["colName"],
-                children=[filt]
-            )
-        ],
-        style={"width": f"{95/num_cols:.2f}%", "padding": "5px"}
+        [html.H6(column["colName"]), filt],
+        style={"width": "33%", "padding": "5px", "textAlign": "center"}
     ))
 
 
