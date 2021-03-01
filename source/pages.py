@@ -14,6 +14,7 @@ import dash_table as dtl
 import dash_html_components as html
 import pandas as pd
 from source import fct_plots
+from source import fct_helper as helper
 
 
 def render_sidebar():
@@ -34,6 +35,8 @@ def render_page(pathname, filters={}, colorCol=None, date_filters={}):
         return home_page(filters, colorCol, date_filters)
     elif pathname == "/main_page":
         return main_page(filters, colorCol, date_filters)
+    elif pathname == "/page-2":
+        return test_page(filters, colorCol, date_filters)
     # If the user tries to reach a different page, return a 404 message
     return dbc.Jumbotron(
         [
@@ -48,7 +51,7 @@ def home_page(filters, colorCol, date_filters):
     # Home page for the dashboard
     # Just an example
     df = pd.read_csv("data.csv")
-    filtered_df = fct_plots.filter_df(df, filters, date_filters)
+    filtered_df = helper.filter_df(df, filters, date_filters)
     return([
         dtl.DataTable(
             id='table',
@@ -80,3 +83,38 @@ def main_page(filters, colorCol, date_filters):
             className="row"
         )
     ])
+
+
+def test_page(filters, colorCol, date_filters):
+    df = pd.read_csv("data.csv")
+    linha1 = dbc.Row(
+        [
+            helper.create_card(df, fct_plots.simple_plot,
+                               title="Grafico qualquer", width=8,
+                               ftype="dynamic_plot",
+                               filters=filters, colorCol=colorCol,
+                               date_filters=date_filters),
+            helper.create_card(df, fct_plots.gauge_plot,
+                               title="Velocimetro", width=4,
+                               ftype="fixed_plot",
+                               filters=filters, colorCol=colorCol,
+                               date_filters=date_filters)
+        ]
+    )
+    linha2 = dbc.Row(
+        [
+            helper.create_card(df, fct_plots.create_table,
+                               title="Dados", width=12,
+                               ftype="data_table",
+                               filters=filters, colorCol=colorCol,
+                               date_filters=date_filters)
+        ]
+    )
+    return(
+        dbc.Container(
+            [
+                linha1, linha2
+            ],
+            fluid=True
+        )
+    )

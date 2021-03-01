@@ -30,14 +30,14 @@ SIDEBAR_STYLE = {
     "bottom": 0,
     "width": "16rem",
     "padding": "2rem 1rem",
-    "background-color": "#202020",
+    "backgroundColor": "#202020",
 }
 
 TOP_STYLE = {
     "position": "fixed",
     "top": "1rem",
     "left": "2rem",
-    "margin-left": "16rem",
+    "marginLeft": "16rem",
     "right": "2rem",
     "borderRadius": "5rem",
     "textAlign": "center",
@@ -56,6 +56,23 @@ sidebar = html.Div(
             pills=True,
         ),
         html.Hr(style={"borderTop": "2px solid #2196F3"}),
+        html.H6("Filtros", style={"color": "#2196F3"}),
+        html.Div(
+            [
+                html.H6(
+                    "Clique aqui para abrir os filtros",
+                    id="UIfilters", n_clicks=0,
+                    style={
+                        "padding": "10px",
+                        "color": "#202020",
+                        "backgroundColor": "#2196F3",
+                        "borderRadius": "5px",
+                    }
+                )
+            ]
+        ),
+        html.Hr(style={"borderTop": "2px solid #2196F3"}),
+
         html.H6("Upload de dados:", style={"color": "#2196F3"}),
         dcc.Upload(
             id='dataUpload',
@@ -83,16 +100,6 @@ with open("assets/columns.json", "r") as file:
 
 topbar = html.Div(
     [
-        html.H4(
-            "Clique aqui para abrir os filtros",
-            id="UIfilters", n_clicks=0,
-            style={
-                "padding": "10px",
-                "color": "#202020",
-                "backgroundColor": "#2196F3",
-                "borderRadius": "5px",
-            }
-        ),
         html.Div(
             [filters.render_top(columns)],
             id="DIVfilters",
@@ -165,15 +172,14 @@ def mostra_filtros(n_clicks):
     if n_clicks % 2 == 0:
         # Esconder a div
         CONTENT_STYLE = {
-            "margin-left": "18rem",
-            "margin-right": "2rem",
-            "margin-top": "3rem",
-            "padding": "2rem 1rem"
+            "marginLeft": "18rem",
+            "marginRight": "2rem",
+            "marginTop": "1rem"
         }
-        return({"display": "none"}, CONTENT_STYLE, "Clique aqui para abrir os filtros")
+        return({"display": "none"}, CONTENT_STYLE, "Abrir filtros")
     else:
         return({"display": "block"}, {"display": "none"},
-               "Fechar os filtros e atualizar a página")
+               "Fechar filtros")
 
 
 if __name__ == "__main__":

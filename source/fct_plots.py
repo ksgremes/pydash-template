@@ -14,35 +14,15 @@ Each function created here should have the following parameters:
 import pandas as pd
 import plotly.express as px
 import dash_daq as daq
-
-
-def filter_df(df, filters={}, date_filters={}):
-    # Filters data.frame
-    # Don't edit this function
-    for col in date_filters.keys():
-        df[col] = pd.to_datetime(df[col])
-    if not bool(filters):
-        return(df)
-    selected = []
-    for key, values in filters.items():
-        selected.append(df[key].isin(values))
-    selected = pd.concat(selected, axis=1)
-    selected_date = []
-    for key, date_range in date_filters.items():
-        selected_date.append(df[key].between(date_range["start"],
-                                             date_range["end"],
-                                             inclusive=True))
-    selected_date = pd.concat(selected_date, axis=1)
-    selected = pd.concat([selected, selected_date], axis=1)
-    filtered_df = df.loc[selected.all(axis=1)]
-    return(filtered_df)
+import dash_table as dtl
+from source import fct_helper as helper
 
 
 def simple_plot(df, filters={}, colorCol=None, date_filters={}):
     # Creates a simple line chart along the dates
     # filters should be a dictionary
 
-    filtered_df = filter_df(df, filters, date_filters)
+    filtered_df = helper.filter_df(df, filters, date_filters)
     if not colorCol:
         summary_df = filtered_df.groupby(["DATA"])
     else:
@@ -83,13 +63,27 @@ def simple_plot(df, filters={}, colorCol=None, date_filters={}):
 
 def gauge_plot(df, filters={}, colorCol=None, date_filters={}):
     # Simple gauge plot
-    filtered_df = filter_df(df, filters, date_filters)
+    filtered_df = helper.filter_df(df, filters, date_filters)
     perc = sum(filtered_df.CONTAMINACAO) / sum(filtered_df.PRODUCAO)*100
     return(daq.Gauge(
         id="gaugeplot",
+        color={"gradient":False,
+               "ranges":{"green":[0,.8],"yellow":[.8,.9],"red":[.9,1]}},
         showCurrentValue=True,
         value=perc,
         units="%",
         min=0,
-        max=100
+        max=100,
+        style={"verticalAlign": "middle"}
+    ))
+
+
+def create_table(df, filters={}, colorCol=None, date_filters={}):
+    # Create datatable object
+    filtered_df = helper.filter_df(df, filters, date_filters)
+    return(dtl.DataTable(
+        columns=[{"name": i, "id": i} for i in filtered_df.columns],
+        data=filtered_df.to_dict('records'),
+        page_size=10,
+        style_table={'overflowX': 'auto'}
     ))
