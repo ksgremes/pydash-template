@@ -5,14 +5,18 @@
 #
 # Kae Gremes - 2021
 
+import base64
+import io
+
 import dash
 import dash_bootstrap_components as dbc
 import dash_core_components as dcc
 import dash_html_components as html
 from source import pages
 from source import filters
-from dash.dependencies import Input, Output
+from dash.dependencies import Input, Output, State, MATCH, ALL
 import json
+import pandas as pd
 
 
 app = dash.Dash(external_stylesheets=[dbc.themes.MATERIA])
@@ -29,8 +33,6 @@ SIDEBAR_STYLE = {
     "background-color": "#202020",
 }
 
-# the styles for the main content position it to the right of the sidebar and
-# add some padding.
 TOP_STYLE = {
     "position": "fixed",
     "top": "1rem",
@@ -49,14 +51,29 @@ sidebar = html.Div(
         ),
         html.Hr(style={"borderTop": "2px solid #2196F3"}),
         dbc.Nav(
-            [
-                dbc.NavLink("Home", href="/", active="exact"),
-                dbc.NavLink("Page 1", href="/page-1", active="exact"),
-                dbc.NavLink("Page 2", href="/page-2", active="exact"),
-            ],
+            pages.render_sidebar(),
             vertical=True,
             pills=True,
         ),
+        html.Hr(style={"borderTop": "2px solid #2196F3"}),
+        html.H6("Upload de dados:", style={"color": "#2196F3"}),
+        dcc.Upload(
+            id='dataUpload',
+            children=html.Div([
+                'Arraste ou  ',
+                html.A('Selecione um arquivo')
+            ]),
+            style={
+                'width': '100%',
+                'height': '40px',
+                'lineHeight': '40px',
+                'borderWidth': '1px',
+                'borderStyle': 'dashed',
+                'borderRadius': '5px',
+                'textAlign': 'center',
+                'color': '#2196F3'
+            }
+        )
     ],
     style=SIDEBAR_STYLE,
 )
@@ -68,7 +85,7 @@ topbar = html.Div(
     [
         html.H4(
             "Clique aqui para abrir os filtros",
-            id="BOTAOFILTROS", n_clicks=0,
+            id="UIfilters", n_clicks=0,
             style={
                 "padding": "10px",
                 "color": "#202020",
@@ -76,26 +93,74 @@ topbar = html.Div(
                 "borderRadius": "5px",
             }
         ),
-        html.Div(id="DIVFILTROS")
+        html.Div(
+            [filters.render_top(columns)],
+            id="DIVfilters",
+            style={"display": "none"}
+        )
     ],
     style=TOP_STYLE
 )
 
 
-content = html.Div(id="pageContent")
+content = html.Div(id="DIVpageContent")
 
-app.layout = html.Div([dcc.Location(id="url"), sidebar, topbar, content])
+app.layout = html.Div([
+    dcc.Location(id="url"),
+    sidebar,
+    topbar,
+    content,
+    html.Div(id="DIVescondido", style={"display": "none"})
+])
+
+@app.callback(Output("DIVescondido", "children"),
+              Input("dataUpload", "contents"))
+def parse_contents(contents):
+    if not contents:
+        return(-1)
+    content_type, content_string = contents.split(',')
+    decoded = base64.b64decode(content_string)
+    try:
+        # Assume that the user uploaded a CSV file
+        df = pd.read_csv(
+            io.StringIO(decoded.decode('utf-8'))
+        )
+    except Exception as e:
+        print(e)
+        return(-1)
+    df.to_csv("data.csv")
+    return(0)
 
 
-@app.callback(Output("pageContent", "children"), [Input("url", "pathname")])
-def render_page_content(pathname):
-    return(pages.render_page(pathname))
+@app.callback(Output("DIVpageContent", "children"),
+              [Input("url", "pathname"),
+               Input({"type": "SELECTfilter", "index": ALL}, "value"),
+               Input("SELECTcolor", "value"),
+               Input({"type": "SELECTdate", "index": ALL}, "start_date"),
+               Input({"type": "SELECTdate", "index": ALL}, "end_date")])
+def render_page_content(pathname, filters, colorCol, dates_start, dates_end):
+    keys = [
+        col["colName"] for col in columns
+        if col["filterable"] == 1 and (col["type"] == "character" or
+                                       col["type"] == "integer")
+    ]
+    date_columns = [
+        col["colName"] for col in columns
+            if col["filterable"] == 1 and col["type"] == "date"
+    ]
+    date_ranges = [{"start": dates_start[i], "end": dates_end[i]}
+                        for i in range(len(dates_start))]
+    return(pages.render_page(pathname,
+                             dict(zip(keys, filters)),
+                             colorCol,
+                             dict(zip(date_columns, date_ranges))
+    ))
 
 
-@app.callback([Output("DIVFILTROS", "children"),
-               Output("pageContent", "style"),
-               Output("BOTAOFILTROS", "children")],
-              [Input("BOTAOFILTROS", "n_clicks")])
+@app.callback([Output("DIVfilters", "style"),
+               Output("DIVpageContent", "style"),
+               Output("UIfilters", "children")],
+              [Input("UIfilters", "n_clicks")])
 def mostra_filtros(n_clicks):
     if n_clicks % 2 == 0:
         # Esconder a div
@@ -105,9 +170,9 @@ def mostra_filtros(n_clicks):
             "margin-top": "3rem",
             "padding": "2rem 1rem"
         }
-        return([], CONTENT_STYLE, "Clique aqui para abrir os filtros")
+        return({"display": "none"}, CONTENT_STYLE, "Clique aqui para abrir os filtros")
     else:
-        return(filters.render_top(columns), {"display": "none"},
+        return({"display": "block"}, {"display": "none"},
                "Fechar os filtros e atualizar a página")
 
 

@@ -3,6 +3,9 @@ Content pages for dashboard
 
 This is the file that should be edited to create different dashboard 'pages'
 Each page is a function, and it should return the html code for the page
+
+Each page has to accept the arguments:
+    filters, colorCol, date_filters (see examples below)
 """
 
 import dash_core_components as dcc
@@ -23,16 +26,14 @@ def render_sidebar():
     ])
 
 
-def render_page(pathname):
+def render_page(pathname, filters={}, colorCol=None, date_filters={}):
     # Render content on pages
     # Edit this function to configure the dashboard
     # Append paths to "if" block below
     if pathname == "/":
-        return home_page()
+        return home_page(filters, colorCol, date_filters)
     elif pathname == "/main_page":
-        return main_page()
-    elif pathname == "/page-1":
-        return main_page()
+        return main_page(filters, colorCol, date_filters)
     # If the user tries to reach a different page, return a 404 message
     return dbc.Jumbotron(
         [
@@ -43,23 +44,27 @@ def render_page(pathname):
     )
 
 
-def home_page():
+def home_page(filters, colorCol, date_filters):
     # Home page for the dashboard
     # Just an example
     df = pd.read_csv("data.csv")
+    filtered_df = fct_plots.filter_df(df, filters, date_filters)
     return([
         dtl.DataTable(
             id='table',
-            columns=[{"name": i, "id": i} for i in df.columns],
-            data=df.to_dict('records'),
+            columns=[{"name": i, "id": i} for i in filtered_df.columns],
+            data=filtered_df.to_dict('records'),
             )
     ])
 
 
-def main_page():
+def main_page(filters, colorCol, date_filters):
     df = pd.read_csv("data.csv")
-    line_plot = fct_plots.simple_plot(df, filters={"AREA": "A"})
-    gauge_plot = fct_plots.gauge_plot(df, filters={"AREA": "B"})
+    line_plot = fct_plots.simple_plot(df, filters=filters,
+                                      colorCol=colorCol,
+                                      date_filters=date_filters)
+    gauge_plot = fct_plots.gauge_plot(df, filters=filters,
+                                      date_filters=date_filters)
     return([
         html.Div([
                 html.Div(

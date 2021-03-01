@@ -11,7 +11,7 @@ import json
 
 def render_top(columns):
     num_cols = sum([col["filterable"] for col in columns])
-    separador = html.Div(
+    separate = html.Div(
         [
             dbc.Row(
                 [
@@ -23,10 +23,11 @@ def render_top(columns):
                             width=5),
                     dbc.Col(
                         [dcc.Dropdown(
-                            id="separador",
+                            id="SELECTcolor",
                             options=[{"label": col["colName"],
                                       "value": col["colName"]}
-                                        for col in columns],
+                                        for col in columns
+                                        if col["filterable"] == 1],
                                       placeholder="Selecione uma coluna",
                                       clearable=True
                         )],
@@ -55,7 +56,7 @@ def render_top(columns):
 
     )
     return(html.Div(
-        [separador, box],
+        [separate, box],
         style={
             "backgroundColor": "#202020",
             "color": "#2196F3",
@@ -76,6 +77,7 @@ def create_filter(column, num_cols):
     if column["type"] == "character" or column["type"] == "integer":
         values = df[column["colName"]].unique()
         filt = dcc.Dropdown(
+            id={"type": "SELECTfilter", "index": f"SELECT{column['colName']}"},
             options=[{"label": val, "value": val} for val in values],
             value=values,
             multi=True,
@@ -85,13 +87,14 @@ def create_filter(column, num_cols):
     elif column["type"] == "date":
         datas = [dta.datetime.strptime(mes, "%Y-%m-%dT%H:%M:%SZ")
                  for mes in df[column["colName"]]]
+        datas = [dia.strftime("%Y-%m-%d") for dia in datas]
         filt = dcc.DatePickerRange(
+            id={"type": "SELECTdate", "index": f"SELECT{column['colName']}"},
             start_date=min(datas),
             end_date=max(datas),
-            display_format="Y-M-D",
+            display_format="MMM-Y",
             style={"height": "100px"}
         )
-    # return(html.Div(filt, style={"width": f"{95/num_cols:.2f}%", "padding": "5px"}))
     return(html.Div(
         [html.H6(column["colName"]), filt],
         style={"width": "33%", "padding": "5px", "textAlign": "center"}
