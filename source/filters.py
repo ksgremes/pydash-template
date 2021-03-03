@@ -68,7 +68,7 @@ def render_top(columns):
 
 
 def create_filter(column, num_cols):
-    df = pd.read_csv("data.csv")
+    df = pd.read_csv("data.csv", sep=";", decimal=",")
     # if column["type"] == "integer":
     #     filt = dcc.Slider(
     #         min=min(df[column["colName"]]),
@@ -82,10 +82,10 @@ def create_filter(column, num_cols):
             value=values,
             multi=True,
             clearable=True,
-            style={"height": "100px", "color": "#000000"}
+            style={"color": "#000000"}
         )
     elif column["type"] == "date":
-        datas = [dta.datetime.strptime(mes, "%Y-%m-%dT%H:%M:%SZ")
+        datas = [dta.datetime.strptime(mes, "%d/%m/%Y")
                  for mes in df[column["colName"]]]
         datas = [dia.strftime("%Y-%m-%d") for dia in datas]
         filt = dcc.DatePickerRange(
@@ -93,7 +93,6 @@ def create_filter(column, num_cols):
             start_date=min(datas),
             end_date=max(datas),
             display_format="MMM-Y",
-            style={"height": "100px"}
         )
     return(html.Div(
         [html.H6(column["colName"]), filt],

@@ -50,7 +50,7 @@ def render_page(pathname, filters={}, colorCol=None, date_filters={}):
 def home_page(filters, colorCol, date_filters):
     # Home page for the dashboard
     # Just an example
-    df = pd.read_csv("data.csv")
+    df = pd.read_csv("data.csv", sep=";", decimal=",")
     filtered_df = helper.filter_df(df, filters, date_filters)
     return([
         dtl.DataTable(
@@ -62,7 +62,7 @@ def home_page(filters, colorCol, date_filters):
 
 
 def main_page(filters, colorCol, date_filters):
-    df = pd.read_csv("data.csv")
+    df = pd.read_csv("data.csv", sep=";", decimal=",")
     line_plot = fct_plots.simple_plot(df, filters=filters,
                                       colorCol=colorCol,
                                       date_filters=date_filters)
@@ -86,7 +86,7 @@ def main_page(filters, colorCol, date_filters):
 
 
 def test_page(filters, colorCol, date_filters):
-    df = pd.read_csv("data.csv")
+    df = pd.read_csv("data.csv", sep=";", decimal=",")
     linha1 = dbc.Row(
         [
             helper.create_card(df, fct_plots.simple_plot,

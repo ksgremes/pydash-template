@@ -130,7 +130,8 @@ def parse_contents(contents):
     try:
         # Assume that the user uploaded a CSV file
         df = pd.read_csv(
-            io.StringIO(decoded.decode('utf-8'))
+            io.StringIO(decoded.decode('utf-8')),
+            sep=";", decimal=","
         )
     except Exception as e:
         print(e)

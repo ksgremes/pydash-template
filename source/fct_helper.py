@@ -13,7 +13,7 @@ def filter_df(df, filters={}, date_filters={}):
     # Filters data.frame
     # Don't edit this function
     for col in date_filters.keys():
-        df[col] = pd.to_datetime(df[col])
+        df[col] = pd.to_datetime(df[col], format="%d/%m/%Y")
     if not bool(filters):
         return(df)
     selected = []

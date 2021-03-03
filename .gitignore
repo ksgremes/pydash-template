@@ -2,3 +2,4 @@
 *.xlsx
 
 source/__pycache__
+venv

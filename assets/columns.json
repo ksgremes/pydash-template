@@ -6,8 +6,8 @@
       "filterable": 1
     },
     {
-      "colName": "DATA",
-      "type": "date",
+      "colName": "EQUIPE",
+      "type": "character",
       "filterable": 1
     },
     {
@@ -16,8 +16,13 @@
       "filterable": 1
     },
     {
-      "colName": "UNIDADE_MEDIDA",
+      "colName": "VARIEDADE",
       "type": "character",
+      "filterable": 1
+    },
+    {
+      "colName": "DATA",
+      "type": "date",
       "filterable": 1
     },
     {
@@ -26,8 +31,8 @@
       "filterable": 1
     },
     {
-      "colName": "COLUNA",
-      "type": "integer",
+      "colName": "UNIDADE_MEDIDA",
+      "type": "character",
       "filterable": 1
     },
     {
