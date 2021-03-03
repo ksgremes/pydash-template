@@ -76,6 +76,7 @@ def create_filter(column, num_cols):
     #     )
     if column["type"] == "character" or column["type"] == "integer":
         values = df[column["colName"]].unique()
+        values = [val for val in values if str(val) != "nan"]
         filt = dcc.Dropdown(
             id={"type": "SELECTfilter", "index": f"SELECT{column['colName']}"},
             options=[{"label": val, "value": val} for val in values],
