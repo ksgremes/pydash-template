@@ -7,7 +7,9 @@
 
 import base64
 import io
+from sys import exit
 
+import monke  # Monkey patching
 import dash
 import dash_bootstrap_components as dbc
 import dash_core_components as dcc
@@ -17,6 +19,7 @@ from source import filters
 from dash.dependencies import Input, Output, State, MATCH, ALL
 import json
 import pandas as pd
+from pyfladesk import init_gui
 
 
 app = dash.Dash(external_stylesheets=[dbc.themes.MATERIA])
@@ -136,7 +139,7 @@ def parse_contents(contents):
     except Exception as e:
         print(e)
         return(-1)
-    df.to_csv("data.csv")
+    df.to_csv("data.csv", sep=";", decimal=",")
     return(0)
 
 
@@ -144,25 +147,33 @@ def parse_contents(contents):
               [Input("url", "pathname"),
                Input({"type": "SELECTfilter", "index": ALL}, "value"),
                Input("SELECTcolor", "value"),
-               Input({"type": "SELECTdate", "index": ALL}, "start_date"),
-               Input({"type": "SELECTdate", "index": ALL}, "end_date")])
-def render_page_content(pathname, filters, colorCol, dates_start, dates_end):
-    keys = [
+               Input("SELECTvar", "value"),
+               Input({"type": "SELECTdate", "index": ALL}, "value"),
+               Input("DIVescondido", "children")])
+def render_page_content(pathname, filters, colorCol, variavel,
+                        date_ranges, placeholder):
+    keys_quick = [
         col["colName"] for col in columns
-        if col["filterable"] == 1 and (col["type"] == "character" or
-                                       col["type"] == "integer")
+        if col["filterable"] == 1
+        and col["quickbar"] == 1
     ]
+    keys_hidden = [
+        col["colName"] for col in columns
+        if col["filterable"] == 1
+        and (col["type"] == "character"
+             or col["type"] == "integer")
+        and col["quickbar"] == 0
+    ]
+    keys = keys_quick + keys_hidden
     date_columns = [
         col["colName"] for col in columns
-            if col["filterable"] == 1 and col["type"] == "date"
+        if col["filterable"] == 1 and col["type"] == "date"
     ]
-    date_ranges = [{"start": dates_start[i], "end": dates_end[i]}
-                        for i in range(len(dates_start))]
     return(pages.render_page(pathname,
                              dict(zip(keys, filters)),
-                             colorCol,
+                             colorCol, variavel,
                              dict(zip(date_columns, date_ranges))
-    ))
+                             ))
 
 
 @app.callback([Output("DIVfilters", "style"),
@@ -184,4 +195,8 @@ def mostra_filtros(n_clicks):
 
 
 if __name__ == "__main__":
+    # monke.null_function()  # just making the editor not complain
+    # init_gui(app.server, port=8050, width=1280, height=720,
+    #          icon="assets/favicon.ico", window_title="Dashboard: CVs")
+    # exit()
     app.run_server(debug=True)

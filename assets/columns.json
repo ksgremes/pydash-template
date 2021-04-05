@@ -1,49 +1,111 @@
 {
   "columns": [
     {
-      "colName": "AREA",
+      "colName": "SEQUENCIA",
       "type": "character",
-      "filterable": 1
+      "filterable": 0,
+      "quickbar": 0
     },
     {
-      "colName": "EQUIPE",
+      "colName": "NOME_LOCAL",
       "type": "character",
-      "filterable": 1
+      "filterable": 1,
+      "quickbar": 0
+    },
+    {
+      "colName": "CONJUNTO",
+      "type": "character",
+      "filterable": 0,
+      "quickbar": 0
+    },
+    {
+      "colName": "ESTAGIO_CORTE",
+      "type": "character",
+      "filterable": 1,
+      "quickbar": 0
+    },
+    {
+      "colName": "DATA_ATIVIDADE",
+      "type": "date",
+      "filterable": 1,
+      "quickbar": 0
+    },
+    {
+      "colName": "ANO_PLANTIO",
+      "type": "character",
+      "filterable": 1,
+      "quickbar": 0
+    },
+    {
+      "colName": "MODELO",
+      "type": "character",
+      "filterable": 0,
+      "quickbar": 0
+    },
+    {
+      "colName": "HUB",
+      "type": "character",
+      "filterable": 1,
+      "quickbar": 1
+    },
+    {
+      "colName": "CICLO",
+      "type": "character",
+      "filterable": 1,
+      "quickbar": 0
     },
     {
       "colName": "FASE",
       "type": "character",
-      "filterable": 1
+      "filterable": 1,
+      "quickbar": 1
     },
     {
-      "colName": "VARIEDADE",
+      "colName": "SAFRA",
       "type": "character",
-      "filterable": 1
+      "filterable": 0,
+      "quickbar": 0
     },
     {
-      "colName": "DATA",
-      "type": "date",
-      "filterable": 1
-    },
-    {
-      "colName": "IMPACTO",
+      "colName": "AMBIENTE",
       "type": "character",
-      "filterable": 1
+      "filterable": 0,
+      "quickbar": 0
     },
     {
-      "colName": "UNIDADE_MEDIDA",
-      "type": "character",
-      "filterable": 1
+      "colName": "MEDIA_PCC",
+      "type": "float",
+      "filterable": 0,
+      "quickbar": 0
     },
     {
-      "colName": "PRODUCAO",
+      "colName": "MEDIA_TCH",
       "type": "float",
       "filterable": 0
     },
     {
-      "colName": "CONTAMINACAO",
+      "colName": "MEDIA_TPH",
       "type": "float",
-      "filterable": 0
+      "filterable": 0,
+      "quickbar": 0
+    },
+    {
+      "colName": "CV_PCC",
+      "type": "float",
+      "filterable": 0,
+      "quickbar": 0
+    },
+    {
+      "colName": "CV_TCH",
+      "type": "float",
+      "filterable": 0,
+      "quickbar": 0
+    },
+    {
+      "colName": "CV_TPH",
+      "type": "float",
+      "filterable": 0,
+      "quickbar": 0
     }
   ]
 }

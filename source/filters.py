@@ -4,62 +4,29 @@
 import dash_bootstrap_components as dbc
 import dash_core_components as dcc
 import dash_html_components as html
-import datetime as dta
 import pandas as pd
 import json
 
 
 def render_top(columns):
-    num_cols = sum([col["filterable"] for col in columns])
-    separate = html.Div(
-        [
-            dbc.Row(
-                [
-                    dbc.Col([html.H3("Cores nos gráficos:")],
-                            style={
-                                "textAlign": "right",
-                                "padding": "5px"
-                            },
-                            width=5),
-                    dbc.Col(
-                        [dcc.Dropdown(
-                            id="SELECTcolor",
-                            options=[{"label": col["colName"],
-                                      "value": col["colName"]}
-                                        for col in columns
-                                        if col["filterable"] == 1],
-                                      placeholder="Selecione uma coluna",
-                                      clearable=True
-                        )],
-                        style={
-                            "textAlign": "left",
-                            "color": "#000000",
-                            "padding": "5px"
-                        },
-                        width=6
-                    )
-
-                ]
-            ),
-            html.Hr(style={"borderTop": "2px solid #2196F3"})
-        ]
-    )
+    width = "33%"
     box = html.Div(
         [
             html.H3("Seleção de dados:"),
             dbc.Nav(
-                [create_filter(col, num_cols)
-                    for col in columns if col["filterable"] != 0],
+                [create_filter(col, width)
+                    for col in columns if col["filterable"] != 0
+                    and col["quickbar"] != 1],
                 vertical=False
                 )
         ],
 
     )
     return(html.Div(
-        [separate, box],
+        [box],
         style={
-            "backgroundColor": "#202020",
-            "color": "#2196F3",
+            "backgroundColor": "#ffffff",
+            "color": "#079400",
             "borderRadius": "5px",
             "textAlign": "left",
             "padding": "5px "
@@ -67,13 +34,8 @@ def render_top(columns):
     ))
 
 
-def create_filter(column, num_cols):
+def create_filter(column, width, quickbar=0):
     df = pd.read_csv("data.csv", sep=";", decimal=",")
-    # if column["type"] == "integer":
-    #     filt = dcc.Slider(
-    #         min=min(df[column["colName"]]),
-    #         max=max(df[column["colName"]])
-    #     )
     if column["type"] == "character" or column["type"] == "integer":
         values = df[column["colName"]].unique()
         values = [val for val in values if str(val) != "nan"]
@@ -83,21 +45,39 @@ def create_filter(column, num_cols):
             value=values,
             multi=True,
             clearable=True,
-            style={"color": "#000000"}
+            style=({"color": "#000000"}
+                   if quickbar == 1 else
+                   {"color": "#000000", "height": "150px",
+                    "overflowY": "scroll"})
         )
     elif column["type"] == "date":
-        datas = [dta.datetime.strptime(mes, "%d/%m/%Y")
-                 for mes in df[column["colName"]]]
-        datas = [dia.strftime("%Y-%m-%d") for dia in datas]
-        filt = dcc.DatePickerRange(
+        datas = pd.concat([df["ATIVIDADE_TCH"], df["ATIVIDADE_TPH"],
+                           df["ATIVIDADE_PCC"]], axis=0)
+        datas = pd.to_datetime(datas, format="%Y-%m-%d")
+        datas = pd.date_range(start=min(datas),
+                              end=max(datas) + pd.DateOffset(months=3),
+                              freq="3M", normalize=False, closed="left")
+        datas_num = pd.to_numeric(datas)
+        datas = datas.strftime("%b-%Y")
+        marks = {
+            str(datas_num[i]):
+            {"label": datas[i], "style": {"writingMode": "vertical-lr",
+                                          "textOrientation": "sideways",
+                                          "height": "100px"
+            }}
+            for i in range(len(datas))
+        }
+        filt = dcc.RangeSlider(
             id={"type": "SELECTdate", "index": f"SELECT{column['colName']}"},
-            start_date=min(datas),
-            end_date=max(datas),
-            display_format="MMM-Y",
+            min=min(datas_num),
+            max=max(datas_num),
+            value=[min(datas_num),max(datas_num)],
+            step=None,
+            marks=marks
         )
     return(html.Div(
-        [html.H6(column["colName"]), filt],
-        style={"width": "33%", "padding": "5px", "textAlign": "center"}
+        [html.H6(f"Filtro: {column['colName']}"), filt],
+        style={"width": width, "padding": "5px", "textAlign": "center"}
     ))
 
 
